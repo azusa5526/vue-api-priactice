@@ -1,5 +1,13 @@
 <template>
-      <table class="table mt-4">
+  <div>
+    <!-- vue-loading-overlay -->
+    <loading :active.sync="isLoading"></loading>
+
+    <div class="text-right">
+      <button class="btn btn-primary mt-4" @click="openModal(true)">建立新的產品</button>
+    </div>
+
+    <table class="table mt-4">
       <thead>
         <tr>
           <th width="150">分類</th>
@@ -10,17 +18,6 @@
           <th width="130">編輯</th>
         </tr>
       </thead>
-
-  
-  
-  <div>
-    <!-- vue-loading-overlay -->
-    <loading :active.sync="isLoading"></loading>
-
-    <div class="text-right">
-      <button class="btn btn-primary mt-4" @click="openModal(true)">建立新的產品</button>
-    </div>
-
 
       <tbody>
         <tr v-for="item in products" :key="item.id">
