@@ -31,7 +31,10 @@
           </td>
           <td>
             <button class="btn btn-outline-primary btn-sm" @click="openModal(false, item)">編輯</button>
-            <button class="btn btn btn-outline-danger btn-sm">刪除</button>
+            <button
+              class="btn btn btn-outline-danger btn-sm"
+              @click="openDeleteProductModal(item)"
+            >刪除</button>
           </td>
         </tr>
       </tbody>
@@ -40,7 +43,7 @@
     <!-- BS pagination -->
     <Pagination :pagination="pagination" @changePage="getProducts"></Pagination>
 
-    <!-- modal -->
+    <!-- BS update product modal -->
     <div
       class="modal fade"
       id="productModal"
@@ -189,6 +192,8 @@
         </div>
       </div>
     </div>
+
+    <!-- BS delete product modal -->
     <div
       class="modal fade"
       id="delProductModal"
@@ -213,7 +218,7 @@
           </div>
           <div class="modal-footer">
             <button type="button" class="btn btn-outline-secondary" data-dismiss="modal">取消</button>
-            <button type="button" class="btn btn-danger">確認刪除</button>
+            <button type="button" class="btn btn-danger" @click="deleteProduct">確認刪除</button>
           </div>
         </div>
       </div>
@@ -233,7 +238,18 @@ export default {
   data() {
     return {
       products: [],
-      tempProduct: {},
+      tempProduct: {
+        category: "testProduct",
+        content: "123456",
+        description: "123456",
+        imageUrl:
+          "https://storage.googleapis.com/vue-course-api.appspot.com/andrew%2F1587815296315.jpg?GoogleAccessId=firebase-adminsdk-zzty7%40vue-course-api.iam.gserviceaccount.com&Expires=1742169600&Signature=Hy5G%2BOR%2F7rbC0jLWrqTPINkEJC0dX8%2B0vB1bqKLt70AdyOKzxtTp9qMdh9idjKtMpIV1aa0Du485NSt5pGos11nYB3lBoO0T03ppET%2FxiH0c3XSeu3KlZsna5e1FcnAoq0Z%2B9%2FzEfOXkaUUhtCHnSe6z8GflmEUu5Tul5DIgamf2ZzO9Zxv9lMTVzSvJX2hvYJVgr7L4SYi4Ify6UeZF4LuIT887GhnqmQdxuUCRmgnayT9QjkQbamSpTApBsyvnkKonlOacEX0LIENX%2FPmhr48yrkjxZGyTmEljxG51E%2Bdi82nqDhbnTxDp0q7Iix1ewpT3mHMJSJHdK4E6aO3D6A%3D%3D",
+        is_enabled: 1,
+        num: 1,
+        origin_price: "100",
+        price: "500",
+        title: "測試產品"
+      },
       isNew: false,
       isLoading: false,
       status: {
@@ -252,7 +268,7 @@ export default {
       vm.isLoading = true;
 
       this.$http.get(api).then(response => {
-        console.log(response.data);
+        //console.log(response.data);
         vm.isLoading = false;
         vm.products = response.data.products;
         vm.pagination = response.data.pagination;
@@ -261,13 +277,19 @@ export default {
 
     openModal(isNew, item) {
       if (isNew) {
-        this.tempProduct = {};
+        // this.tempProduct = {};
         this.isNew = true;
       } else {
         this.tempProduct = Object.assign({}, item); //避免傳參考
         this.isNew = false;
       }
       $("#productModal").modal("show");
+    },
+
+    openDeleteProductModal(item) {
+      //console.log("delete mode");
+      this.tempProduct = Object.assign({}, item);
+      $("#delProductModal").modal("show");
     },
 
     updateProduct() {
@@ -281,14 +303,30 @@ export default {
       }
 
       this.$http[httpMethod](api, { data: vm.tempProduct }).then(response => {
-        console.log(response.data);
+        //console.log(response.data);
         if (response.data.success) {
           $("#productModal").modal("hide");
           vm.getProducts(vm.pagination.current_page); //停留頁面在修改項目的頁籤下(default page = 1)
         } else {
           $("#productModal").modal("hide");
-          vm.getProducts();
+          vm.getProducts(vm.pagination.current_page);
           console.log("新增產品失敗");
+        }
+      });
+    },
+
+    deleteProduct() {
+      const vm = this;
+      let api = `${process.env.API_PATH}/api/${process.env.CUSTOM_PATH}/admin/product/${vm.tempProduct.id}`;
+      this.$http.delete(api).then(response => {
+        if (response.data.success) {
+          console.log(response.data);
+          $("#delProductModal").modal("hide");
+          vm.getProducts(vm.pagination.current_page);
+        } else {
+          $("#delProductModal").modal("hide");
+          vm.getProducts(vm.pagination.current_page);
+          console.log("刪除產品失敗");
         }
       });
     },
