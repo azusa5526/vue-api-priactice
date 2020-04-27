@@ -44,11 +44,11 @@
         </h6>
         <ul class="nav flex-column mb-2">
           <li class="nav-item">
-            <a class="nav-link" href="#">
-              <i class="fas fa-vial"></i>
+            <router-link class="nav-link" to="/customer_order">
+              <i class="fas fa-box-open"></i>
               <span data-feather="file-text"></span>
               模擬訂單
-            </a>
+            </router-link>
           </li>
         </ul>
       </div>

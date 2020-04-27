@@ -41,7 +41,7 @@
     <!-- BS pagination -->
     <Pagination :pagination="pagination" @changePage="getCoupons"></Pagination>
 
-    <!-- BS update product modal -->
+    <!-- BS update coupon modal -->
     <div
       class="modal fade"
       id="couponModal"

@@ -60,7 +60,7 @@ export default {
     getOrders(page = 1) {
       //default page 1
       //console.log(process.env.API_PATH, process.env.CUSTOM_PATH);
-      const api = `${process.env.API_PATH}/api/${process.env.CUSTOM_PATH}/admin/orders?page=:page`;
+      const api = `${process.env.API_PATH}/api/${process.env.CUSTOM_PATH}/admin/orders?page=${page}`;
       const vm = this;
       vm.isLoading = true;
 
