@@ -3,9 +3,9 @@ import Router from 'vue-router';
 //import HelloWorld from '@/components/HelloWorld';
 import Login from '@/components/pages/Login';
 import Dashboard from '@/components/Dashboard';
-import Products from '@/components/Products';
-import OrderList from '@/components/OrderList';
-import Coupon from '@/components/Coupon';
+import Products from '@/components/pages/Products';
+import OrderList from '@/components/pages/OrderList';
+import Coupon from '@/components/pages/Coupon';
 
 Vue.use(Router);
 
