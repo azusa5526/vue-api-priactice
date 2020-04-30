@@ -34,11 +34,11 @@
               class="btn btn-outline-secondary btn-sm"
               @click="getProduct(item.id)"
             >
-              <i class="fas fa-spinner fa-spin"></i>
+              <i class="fas fa-spinner fa-spin" v-if="status.loadingItem === item.id"></i>
               查看更多
             </button>
             <button type="button" class="btn btn-outline-danger btn-sm ml-auto">
-              <i class="fas fa-spinner fa-spin"></i>
+              <i class="fas fa-spinner fa-spin" v-if="status.loadingItem === item.id"></i>
               加到購物車
             </button>
           </div>
@@ -46,7 +46,7 @@
       </div>
     </div>
 
-    <!-- BS costomer order modal -->
+		<!-- BS modal -->
     <div
       class="modal fade"
       id="productModal"
@@ -56,48 +56,41 @@
       aria-hidden="true"
     >
       <div class="modal-dialog" role="document">
-        <div class="modal-content border-0">
-          <div class="modal-header bg-dark text-white">
-            <h5 class="modal-title" id="exampleModalLabel">
-              {{product.title}}
-            </h5>
+        <div class="modal-content">
+          <div class="modal-header">
+            <h5 class="modal-title" id="exampleModalLabel">{{ product.title }}</h5>
             <button type="button" class="close" data-dismiss="modal" aria-label="Close">
               <span aria-hidden="true">&times;</span>
             </button>
           </div>
           <div class="modal-body">
-            <div class="row">
-              <div class="col-sm-12">
-                <div
-                  style="height: 150px; background-size: cover; background-position: center"
-                  :style="{backgroundImage: `url(${product.imageUrl})`}"
-                ></div>
-
-                <div class="form-row">
-                  <div class="form-group col-md-12 mt-2">
-                    <label for="category">{{product.content}}</label>
-                  </div>
-                </div>
-
-                <div class="form-row">
-                  <div class="form-group col-md-12" v-if="product.price">
-                    <del class="h6">原價 {{product.origin_price}} 元</del>
-                  </div>
-                </div>
-
-                <div class="form-row">
-                  <div class="form-group col-md-12 text-right">
-                    <div class="h5" v-if="product.price">現在只要 {{product.price}} 元</div>
-										<div class="h5" v-else>現在只要 {{product.origin_price}} 元</div>
-                  </div>
-                </div>
-
-              </div>
+            <img :src="product.imageUrl" class="img-fluid" alt />
+            <blockquote class="blockquote mt-3">
+              <p class="mb-0">{{ product.content }}</p>
+              <footer class="blockquote-footer text-right">{{ product.description }}</footer>
+            </blockquote>
+            <div class="d-flex justify-content-between align-items-baseline">
+              <div class="h4" v-if="!product.price">{{ product.origin_price }} 元</div>
+              <del class="h6" v-if="product.price">原價 {{ product.origin_price }} 元</del>
+              <div class="h4" v-if="product.price">現在只要 {{ product.price }} 元</div>
             </div>
+            <select name class="form-control mt-3" v-model="product.num">
+              <option :value="num" v-for="num in 10" :key="num">選購 {{num}} {{product.unit}}</option>
+            </select>
           </div>
           <div class="modal-footer">
-            <button type="button" class="btn btn-outline-secondary" data-dismiss="modal">取消</button>
-            <button type="button" class="btn btn-primary">確認</button>
+            <div class="text-muted text-nowrap mr-3">
+              小計
+              <strong>{{ product.num * product.price }}</strong> 元
+            </div>
+            <button
+              type="button"
+              class="btn btn-primary"
+              @click="addtoCart(product.id, product.num)"
+            >
+              <i class="fas fa-spinner fa-spin"></i>
+              加到購物車
+            </button>
           </div>
         </div>
       </div>
@@ -121,7 +114,10 @@ export default {
     return {
       products: [],
       product: {},
-      isLoading: false,
+			isLoading: false,
+			status: {
+				loadingItem: '',
+			},
       pagination: {}
     };
   },
@@ -146,13 +142,13 @@ export default {
     getProduct(id) {
       const api = `${process.env.API_PATH}/api/${process.env.CUSTOM_PATH}/product/${id}`;
       const vm = this;
-      vm.isLoading = true;
+      vm.status.loadingItem = id;
 
       this.$http.get(api).then(response => {
         console.log(response.data);
         vm.product = response.data.product;
         $("#productModal").modal("show");
-        vm.isLoading = false;
+        vm.status.loadingItem = '';
       });
     }
   },
