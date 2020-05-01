@@ -19,7 +19,7 @@
             </router-link>
           </li>
           <li class="nav-item">
-            <router-link class="nav-link" to="/admin/orderList">
+            <router-link class="nav-link" to="/admin/order_list">
               <i class="fas fa-box-open"></i>
               <span data-feather="file-text"></span>
               訂單列表

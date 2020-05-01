@@ -109,30 +109,34 @@
         <table class="table mt-4">
           <thead>
             <tr>
-              <th></th>
               <th>品名</th>
-              <th>數量/單位</th>
-              <th>單價/總價</th>
+              <th width="150">數量/單位</th>
+              <th width="150">單價/小計</th>
+              <th>移除商品</th>
             </tr>
           </thead>
 
           <tbody>
             <tr v-for="item in shoppingCart.carts" :key="item.id">
+              <td class="align-middle">{{item.product.title}}</td>
+              <td class="align-middle">{{item.qty}} / {{item.product.unit}}</td>
+              <td class="align-middle">{{item.product.price}} / {{item.total}}</td>
               <td>
-                <button type="button" class="btn btn-outline-danger btn-sm">
+                <button
+                  type="button"
+                  class="btn btn-outline-danger btn-sm"
+                  @click="removeCartItem(item.id)"
+                >
                   <i class="far fa-trash-alt"></i>
                 </button>
               </td>
-              <td class="align-middle">{{item.product.title}}</td>
-              <td>{{item.qty}} / {{item.product.unit}}</td>
-              <td>{{item.product.price}} / {{item.total}}</td>
             </tr>
             <tr>
-							<td colspan="3">總計</td>
+              <td colspan="3">總計</td>
               <td class="text-right">{{shoppingCart.total}}</td>
             </tr>
             <tr>
-							<td colspan="3">優惠價</td>
+              <td colspan="3">優惠價</td>
               <td class="text-right">{{shoppingCart.final_total}}</td>
             </tr>
           </tbody>
@@ -214,6 +218,23 @@ export default {
           console.log("fail to add item to cart");
           vm.status.itemAdding = false;
           $("#productModal").modal("hide");
+        }
+      });
+    },
+
+    removeCartItem(id) {
+      const api = `${process.env.API_PATH}/api/${process.env.CUSTOM_PATH}/cart/${id}`;
+      const vm = this;
+      vm.isLoading = true;
+
+      this.$http.delete(api).then(response => {
+        if (response.data.success) {
+          console.log(response.data);
+          vm.getCart();
+          vm.isLoading = false;
+        } else {
+          console.log("fail to delete item to cart");
+          vm.isLoading = false;
         }
       });
     },
