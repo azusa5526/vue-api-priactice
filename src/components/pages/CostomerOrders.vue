@@ -110,15 +110,18 @@
           <thead>
             <tr>
               <th>品名</th>
-              <th width="150">數量/單位</th>
-              <th width="150">單價/小計</th>
+              <th>數量/單位</th>
+              <th>單價/小計</th>
               <th>移除商品</th>
             </tr>
           </thead>
 
           <tbody>
             <tr v-for="item in shoppingCart.carts" :key="item.id">
-              <td class="align-middle">{{item.product.title}}</td>
+              <td class="align-middle">
+                {{item.product.title}}
+                <div class="text-success" v-if="item.coupon">已套用優惠券 {{item.coupon.title}}</div>
+              </td>
               <td class="align-middle">{{item.qty}} / {{item.product.unit}}</td>
               <td class="align-middle">{{item.product.price}} / {{item.total}}</td>
               <td>
@@ -131,16 +134,25 @@
                 </button>
               </td>
             </tr>
+          </tbody>
+          <tfoot>
             <tr>
-              <td colspan="3">總計</td>
+              <td colspan="3" class="text-right">總計</td>
               <td class="text-right">{{shoppingCart.total}}</td>
             </tr>
-            <tr>
-              <td colspan="3">優惠價</td>
-              <td class="text-right">{{shoppingCart.final_total}}</td>
+            <tr v-if="shoppingCart.total !== shoppingCart.final_total">
+              <td colspan="3" class="text-right text-success">優惠價</td>
+              <td class="text-right text-success">{{shoppingCart.final_total}}</td>
             </tr>
-          </tbody>
+          </tfoot>
         </table>
+
+        <div class="input-group mb-3 input-group-sm">
+          <input type="text" class="form-control" placeholder="請輸入優惠碼" v-model="couponCode" />
+          <div class="input-group-append">
+            <button class="btn btn-outline-secondary" type="button" @click="addCouponCode">套用優惠碼</button>
+          </div>
+        </div>
       </div>
     </div>
   </div>
@@ -165,7 +177,8 @@ export default {
         itemAdding: false
       },
       pagination: {},
-      shoppingCart: []
+      shoppingCart: [],
+      couponCode: ""
     };
   },
 
@@ -234,6 +247,26 @@ export default {
           vm.isLoading = false;
         } else {
           console.log("fail to delete item to cart");
+          vm.isLoading = false;
+        }
+      });
+    },
+
+    addCouponCode() {
+      const api = `${process.env.API_PATH}/api/${process.env.CUSTOM_PATH}/coupon`;
+      const vm = this;
+      const coupon = {
+        code: vm.couponCode
+      };
+      vm.isLoading = true;
+
+      this.$http.post(api, { data: coupon }).then(response => {
+        if (response.data.success) {
+          console.log(response.data);
+          vm.getCart();
+          vm.isLoading = false;
+        } else {
+          console.log(response.data);
           vm.isLoading = false;
         }
       });
