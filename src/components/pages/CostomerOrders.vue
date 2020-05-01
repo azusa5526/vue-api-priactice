@@ -9,7 +9,7 @@
 
     <!-- BS card -->
     <div class="row mt-4">
-      <div class="col-md-4 mb-4" v-for="item in products" :key="item.id">
+      <div class="col-md-4 mb-4" v-for="item in activatedList" :key="item.id">
         <div class="card border-0 shadow-sm">
           <div
             style="height: 150px; background-size: cover; background-position: center"
@@ -37,7 +37,11 @@
               <i class="fas fa-spinner fa-spin" v-if="status.loadingItem === item.id"></i>
               查看更多
             </button>
-            <button type="button" class="btn btn-outline-danger btn-sm ml-auto">
+            <button
+              type="button"
+              class="btn btn-outline-danger btn-sm ml-auto"
+              @click="addToCart(item.id)"
+            >
               <i class="fas fa-spinner fa-spin" v-if="status.loadingItem === item.id"></i>
               加到購物車
             </button>
@@ -46,7 +50,7 @@
       </div>
     </div>
 
-		<!-- BS modal -->
+    <!-- BS modal -->
     <div
       class="modal fade"
       id="productModal"
@@ -86,9 +90,9 @@
             <button
               type="button"
               class="btn btn-primary"
-              @click="addtoCart(product.id, product.num)"
+              @click="addToCart(product.id, product.num)"
             >
-              <i class="fas fa-spinner fa-spin"></i>
+              <i class="fas fa-spinner fa-spin" v-if="status.itemAdding"></i>
               加到購物車
             </button>
           </div>
@@ -98,6 +102,43 @@
 
     <!-- BS pagination -->
     <Pagination :pagination="pagination" @changePage="getProducts"></Pagination>
+
+    <!-- Shopping cart -->
+    <div class="my-5 row justify-content-center">
+      <div class="my-5 row justify-content-center">
+        <table class="table mt-4">
+          <thead>
+            <tr>
+              <th></th>
+              <th>品名</th>
+              <th>數量/單位</th>
+              <th>單價/總價</th>
+            </tr>
+          </thead>
+
+          <tbody>
+            <tr v-for="item in shoppingCart.carts" :key="item.id">
+              <td>
+                <button type="button" class="btn btn-outline-danger btn-sm">
+                  <i class="far fa-trash-alt"></i>
+                </button>
+              </td>
+              <td class="align-middle">{{item.product.title}}</td>
+              <td>{{item.qty}} / {{item.product.unit}}</td>
+              <td>{{item.product.price}} / {{item.total}}</td>
+            </tr>
+            <tr>
+							<td colspan="3">總計</td>
+              <td class="text-right">{{shoppingCart.total}}</td>
+            </tr>
+            <tr>
+							<td colspan="3">優惠價</td>
+              <td class="text-right">{{shoppingCart.final_total}}</td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
+    </div>
   </div>
 </template>
 
@@ -114,11 +155,13 @@ export default {
     return {
       products: [],
       product: {},
-			isLoading: false,
-			status: {
-				loadingItem: '',
-			},
-      pagination: {}
+      isLoading: false,
+      status: {
+        loadingItem: "",
+        itemAdding: false
+      },
+      pagination: {},
+      shoppingCart: []
     };
   },
 
@@ -131,7 +174,7 @@ export default {
       vm.isLoading = true;
 
       this.$http.get(api).then(response => {
-        console.log(response.data);
+        //console.log(response.data);
         vm.isLoading = false;
         vm.products = response.data.products;
         vm.pagination = response.data.pagination;
@@ -148,13 +191,58 @@ export default {
         console.log(response.data);
         vm.product = response.data.product;
         $("#productModal").modal("show");
-        vm.status.loadingItem = '';
+        vm.status.loadingItem = "";
+      });
+    },
+
+    addToCart(id, qty = 1) {
+      const api = `${process.env.API_PATH}/api/${process.env.CUSTOM_PATH}/cart`;
+      const vm = this;
+      vm.status.itemAdding = true;
+      const cart = {
+        product_id: id,
+        qty
+      };
+
+      this.$http.post(api, { data: cart }).then(response => {
+        if (response.data.success) {
+          console.log(response.data);
+          vm.status.itemAdding = false;
+          vm.getCart();
+          $("#productModal").modal("hide");
+        } else {
+          console.log("fail to add item to cart");
+          vm.status.itemAdding = false;
+          $("#productModal").modal("hide");
+        }
+      });
+    },
+
+    getCart() {
+      const api = `${process.env.API_PATH}/api/${process.env.CUSTOM_PATH}/cart`;
+      const vm = this;
+      vm.isLoading = true;
+
+      this.$http.get(api).then(response => {
+        console.log(response.data);
+        vm.isLoading = false;
+        vm.shoppingCart = response.data.data;
+      });
+    }
+  },
+
+  computed: {
+    activatedList() {
+      const vm = this;
+      return vm.products.filter(function(item) {
+        return item.is_enabled;
       });
     }
   },
 
   created() {
     this.getProducts();
+    this.getCart();
   }
 };
 </script>
