@@ -7,6 +7,7 @@ import 'bootstrap';
 import Loading from 'vue-loading-overlay';
 import 'vue-loading-overlay/dist/vue-loading.css';
 import VeeValidate from 'vee-validate';
+import zhTWValidate from 'vee-validate/dist/locale/zh_TW';
 
 import App from './App';
 import router from './router';
@@ -17,6 +18,7 @@ import timestampToDate from './filters/timestampToDate';
  
 Vue.use(VueAxios, axios);
 Vue.use(VeeValidate);
+VeeValidate.Validator.localize('zh_TW', zhTWValidate);
 axios.defaults.withCredentials = true;
 
 Vue.component('Loading', Loading);

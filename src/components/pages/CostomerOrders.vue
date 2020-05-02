@@ -166,10 +166,12 @@
             class="form-control"
             name="email"
             id="useremail"
+            v-validate="'required|email'"
             v-model="form.user.email"
+						:class="{'is-invalid' : errors.has('tel')}"
             placeholder="請輸入 Email"
           />
-          <span class="text-danger"></span>
+          <span class="text-danger" v-if="errors.has('email')">{{ errors.first('email') }}</span>
         </div>
 
         <div class="form-group">
@@ -180,8 +182,8 @@
             name="name"
             id="username"
             v-model="form.user.name"
-						v-validate="'required'"
-						:class="{'is-invalid' : errors.has('name')}"
+            v-validate="'required'"
+            :class="{'is-invalid' : errors.has('name')}"
             placeholder="輸入姓名"
           />
           <span class="text-danger" v-if="errors.has('name')">姓名必須輸入</span>
@@ -192,10 +194,14 @@
           <input
             type="tel"
             class="form-control"
+						name="tel"
             id="usertel"
             v-model="form.user.tel"
+						v-validate="'required'"
+            :class="{'is-invalid' : errors.has('tel')}"
             placeholder="請輸入電話"
           />
+					 <span class="text-danger" v-if="errors.has('tel')">收件人電話必須輸入</span>
         </div>
 
         <div class="form-group">
@@ -206,9 +212,11 @@
             name="address"
             id="useraddress"
             v-model="form.user.address"
+						v-validate="'required'"
+            :class="{'is-invalid' : errors.has('address')}"
             placeholder="請輸入地址"
           />
-          <span class="text-danger">地址欄位不得留空</span>
+          <span class="text-danger" v-if="errors.has('address')">收件人地址必須輸入</span>
         </div>
 
         <div class="form-group">
@@ -246,13 +254,13 @@ export default {
       couponCode: "",
       form: {
         user: {
-          name: '',
-          email: '',
-          tel: '',
-          address: '',
+          name: "",
+          email: "",
+          tel: "",
+          address: ""
         },
-        message: '',
-      },
+        message: ""
+      }
     };
   },
 
@@ -360,16 +368,25 @@ export default {
 
     createOrder() {
       const api = `${process.env.API_PATH}/api/${process.env.CUSTOM_PATH}/order`;
-			const vm = this;
-			const order = vm.form;
+      const vm = this;
+      const order = vm.form;
       vm.isLoading = true;
 
-      this.$http.post(api, {data: order}).then(response => {
-				console.log(response.data, "訂單已建立");
-				vm.getCart();
-        vm.isLoading = false;
+      this.$validator.validate().then((valid) => {
+        if (valid) {
+          this.$http.post(api, { data: order }).then(response => {
+            console.log(response.data, "訂單已建立");
+            vm.getCart();
+            vm.isLoading = false;
+          });
+        } else {
+					console.log('尚有欄位未填寫');
+					vm.isLoading = false;
+				}
       });
-    }
+		},
+		
+
   },
 
   computed: {
