@@ -6,17 +6,23 @@ import VueAxios from 'vue-axios';
 import 'bootstrap';
 import Loading from 'vue-loading-overlay';
 import 'vue-loading-overlay/dist/vue-loading.css';
+import VeeValidate from 'vee-validate';
 
 import App from './App';
 import router from './router';
 import './bus';
-import currencyFilter from './filters/currency'
+import currencyFilter from './filters/currency';
+import timestampToDate from './filters/timestampToDate';
+//import dateToTimestamp from './filters/dateToTimestamp';
  
 Vue.use(VueAxios, axios);
+Vue.use(VeeValidate);
 axios.defaults.withCredentials = true;
 
 Vue.component('Loading', Loading);
 Vue.filter('currency', currencyFilter);
+Vue.filter('timestampToDate', timestampToDate);
+//Vue.filter('dateToTimestamp', dateToTimestamp);
 
 Vue.config.productionTip = false
 

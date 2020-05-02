@@ -6,7 +6,7 @@
     <table class="table mt-4">
       <thead>
         <tr>
-          <th width="130">購買時間</th>
+          <th width="150">購買時間</th>
           <th>Email</th>
           <th>購買物品</th>
           <th width="130">應付金額</th>
@@ -16,9 +16,10 @@
 
       <tbody>
         <tr v-for="item in orders" :key="item.id">
-          <td>{{item.create_at}}</td>
+          <td>{{item.create_at | timestampToDate}}</td>
           <td>{{item.user.email}}</td>
           <td>{{item.products.product_id}}</td>
+          <!-- to be fix -->
           <td class="text-right">{{item.total}}</td>
           <td>
             <span class="text-success" v-if="item.is_paid">已付款</span>
