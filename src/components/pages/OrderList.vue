@@ -18,7 +18,14 @@
         <tr v-for="item in orders" :key="item.id">
           <td>{{item.create_at | timestampToDate}}</td>
           <td>{{item.user.email}}</td>
-          <td>{{item.products.product_id}}</td>
+          <td>
+            <!-- https://stackoverflow.com/questions/1027354/i-need-an-unordered-list-without-any-bullets -->
+            <ul class="list-unstyled">
+              <li v-for="(product, id) in item.products" :key="id">
+                {{product.product.title}} / {{product.qty}} {{product.product.unit}}
+              </li>
+            </ul>
+          </td>
           <!-- to be fix -->
           <td class="text-right">{{item.total}}</td>
           <td>

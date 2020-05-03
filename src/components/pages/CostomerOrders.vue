@@ -168,7 +168,7 @@
             id="useremail"
             v-validate="'required|email'"
             v-model="form.user.email"
-						:class="{'is-invalid' : errors.has('tel')}"
+            :class="{'is-invalid' : errors.has('tel')}"
             placeholder="請輸入 Email"
           />
           <span class="text-danger" v-if="errors.has('email')">{{ errors.first('email') }}</span>
@@ -194,14 +194,14 @@
           <input
             type="tel"
             class="form-control"
-						name="tel"
+            name="tel"
             id="usertel"
             v-model="form.user.tel"
-						v-validate="'required'"
+            v-validate="'required'"
             :class="{'is-invalid' : errors.has('tel')}"
             placeholder="請輸入電話"
           />
-					 <span class="text-danger" v-if="errors.has('tel')">收件人電話必須輸入</span>
+          <span class="text-danger" v-if="errors.has('tel')">收件人電話必須輸入</span>
         </div>
 
         <div class="form-group">
@@ -212,7 +212,7 @@
             name="address"
             id="useraddress"
             v-model="form.user.address"
-						v-validate="'required'"
+            v-validate="'required'"
             :class="{'is-invalid' : errors.has('address')}"
             placeholder="請輸入地址"
           />
@@ -372,21 +372,22 @@ export default {
       const order = vm.form;
       vm.isLoading = true;
 
-      this.$validator.validate().then((valid) => {
+      this.$validator.validate().then(valid => {
         if (valid) {
           this.$http.post(api, { data: order }).then(response => {
             console.log(response.data, "訂單已建立");
-            vm.getCart();
+            if (response.data.success) {
+              vm.$router.push(`/customer_checkout/${response.data.orderId}`);
+            }
+            //vm.getCart();
             vm.isLoading = false;
           });
         } else {
-					console.log('尚有欄位未填寫');
-					vm.isLoading = false;
-				}
+          console.log("尚有欄位未填寫");
+          vm.isLoading = false;
+        }
       });
-		},
-		
-
+    }
   },
 
   computed: {
